@@ -10,6 +10,7 @@ import UIKit
 import SDWebImage
 
 class ViewController: UIViewController {
+    var refreshControl: UIRefreshControl!
     @IBOutlet weak var tableView: UITableView!
 
     var users: [User] = [User]()
@@ -19,17 +20,28 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        initViews()
         initData()
         // Do any additional setup after loading the view.
     }
     
-    func initData() {
+    func initViews() {
+        refreshControl = UIRefreshControl()
+        self.tableView.addSubview(refreshControl)
+        refreshControl.addTarget(self, action: #selector(initData), for: UIControl.Event.valueChanged)
+        refreshControl.beginRefreshing()
+    }
+    
+    @objc func initData() {
         userService.downloadFirstBatch { (success, users, error) in
             DispatchQueue.main.async {
                 // init data
                 self.users = users
                 // update ui
+                self.refreshControl.endRefreshing()
                 self.tableView.reloadData()
+
+                // NOTE: need to discuss with ui designer for better ux when errors encountered
             }
         }
     }
@@ -41,6 +53,8 @@ class ViewController: UIViewController {
                 self.users.append(contentsOf: users)
                 // update ui
                 self.tableView.reloadData()
+                
+                // NOTE: need to discuss with ui designer for better ux when errors encountered
             }
         }
     }
