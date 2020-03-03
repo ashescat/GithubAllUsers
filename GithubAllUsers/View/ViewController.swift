@@ -24,10 +24,21 @@ class ViewController: UIViewController {
     }
     
     func initData() {
-        userService.download { (success, users, error) in
+        userService.downloadFirstBatch { (success, users, error) in
             DispatchQueue.main.async {
                 // init data
                 self.users = users
+                // update ui
+                self.tableView.reloadData()
+            }
+        }
+    }
+    
+    func loadMoreData() {
+        userService.downloadMore { (success, users, error) in
+            DispatchQueue.main.async {
+                // add data
+                self.users.append(contentsOf: users)
                 // update ui
                 self.tableView.reloadData()
             }
@@ -56,7 +67,12 @@ extension ViewController : UITableViewDataSource, UITableViewDelegate {
         return cell
     }
     
-    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        // table view reaches last row, go and fetch more data
+        if indexPath.row == self.users.count - 1 {
+            loadMoreData()
+        }
+    }
 }
 
 class UserTableViewCell: UITableViewCell {

@@ -14,11 +14,6 @@ public struct Link: Equatable, Hashable {
     self.parameters = parameters ?? [:]
   }
 
-  /// Returns the hash value
-  public var hashValue: Int {
-    return uri.hashValue
-  }
-
   /// Relation type of the Link.
   public var relationType: String? {
     return parameters["rel"]
@@ -170,8 +165,8 @@ func split(_ separator: String) -> (String) -> (String, String) {
     let range = input.range(of: separator, options: NSString.CompareOptions(rawValue: 0), range: nil, locale: nil)
 
     if let range = range {
-      let lhs = String(input[..<range.lowerBound])
-      let rhs = String(input[range.upperBound...])
+        let lhs = String(input[..<range.lowerBound])//.substring(to: range.lowerBound)
+        let rhs = String(input[range.upperBound...])//.substring(from: range.upperBound)
       return (lhs, rhs)
     }
 
@@ -193,9 +188,10 @@ func takeFirst(_ input: [String]) -> (String, ArraySlice<String>) {
 func trim(_ lhs: Character, _ rhs: Character) -> (String) -> String {
   return { input in
     if input.hasPrefix("\(lhs)") && input.hasSuffix("\(rhs)") {
-      return String(input[input.characters.index(after: input.startIndex)..<input.characters.index(before: input.endIndex)])
+      return String(input[input.index(after: input.startIndex)..<input.index(before: input.endIndex)])
     }
 
     return input
   }
 }
+
