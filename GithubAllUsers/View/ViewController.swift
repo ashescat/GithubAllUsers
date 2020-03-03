@@ -13,9 +13,25 @@ class ViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
 
     var users: [User] = [User]()
+    lazy var userService: UserService  = {
+        return UserService()
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        initData()
         // Do any additional setup after loading the view.
+    }
+    
+    func initData() {
+        userService.download { (success, users, error) in
+            DispatchQueue.main.async {
+                // init data
+                self.users = users
+                // update ui
+                self.tableView.reloadData()
+            }
+        }
     }
 }
 
